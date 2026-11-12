@@ -111,7 +111,33 @@ nav.tabs button[aria-current="true"]{color:var(--moss-deep)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center;z-index:6}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.bob{animation:none}.orb{transition:none}}
+.splash{position:fixed;inset:0;z-index:30;background:var(--bg);display:grid;place-content:center;justify-items:center;gap:12px;text-align:center;transition:opacity .5s ease,visibility .5s}
+.splash.done{opacity:0;visibility:hidden}
+.splash svg{width:120px;height:116px;animation:hop .9s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-14px)}}
+.splash h2{font-size:34px;color:var(--moss-deep)}
+.splash p{margin:0;color:var(--muted);font-weight:800}
+.load{width:160px;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.load i{display:block;height:100%;width:0;background:var(--moss);border-radius:999px;animation:fill 1.3s ease-out forwards}
+@keyframes fill{to{width:100%}}
+@media (prefers-reduced-motion:reduce){.splash svg,.load i{animation:none}.load i{width:100%}}
 </style>
+
+<div class="splash" id="splash" aria-label="Loading Mossling">
+  <svg viewBox="0 0 200 190" aria-hidden="true">
+    <path d="M100 30c-6-14-22-18-30-10 10 0 20 6 26 14z" fill="var(--moss-deep)"/>
+    <path d="M102 32c4-15 20-22 30-14-10 1-19 7-24 16z" fill="var(--moss)"/>
+    <ellipse cx="100" cy="112" rx="62" ry="60" fill="var(--moss)"/>
+    <ellipse cx="100" cy="128" rx="38" ry="32" fill="color-mix(in srgb,var(--moss) 55%,#ffffff)"/>
+    <ellipse cx="80" cy="104" rx="7" ry="9" fill="#23302b"/><ellipse cx="120" cy="104" rx="7" ry="9" fill="#23302b"/>
+    <circle cx="82" cy="100" r="2.5" fill="#fff"/><circle cx="122" cy="100" r="2.5" fill="#fff"/>
+    <circle cx="68" cy="120" r="7" fill="#f29aa8" opacity=".55"/><circle cx="132" cy="120" r="7" fill="#f29aa8" opacity=".55"/>
+    <path d="M90 116q10 12 20 0" stroke="#23302b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+  <h2>Mossling</h2>
+  <div class="load"><i></i></div>
+  <p id="splashMsg">Waking up your Mossling, Sir…</p>
+</div>
 
 <div class="app">
   <div class="top">
@@ -206,6 +232,11 @@ nav.tabs button[aria-current="true"]{color:var(--moss-deep)}
       <h3>Closet</h3>
       <p class="sub">Spend dew drops on outfits. Tap an owned item to wear it.</p>
       <div class="shop" id="shop"></div>
+    </div>
+    <div class="card" id="updCard" hidden>
+      <h3>App updates</h3>
+      <p class="sub" id="verTxt"></p>
+      <button class="btn ghost" id="updBtn">Check for updates</button>
     </div>
     <div class="card">
       <h3>Rename your pet</h3>
@@ -439,6 +470,8 @@ $("shop").onclick=e=>{const b=e.target.closest("[data-shop]");if(!b)return;const
   save();render()};
 $("nameForm").onsubmit=e=>{e.preventDefault();const v=$("nameInput").value.trim();if(!v)return;S.name=v;$("nameInput").value="";save();render();toast(`Hi Sir, I'm ${v}!`)};
 document.addEventListener("click",e=>{if(e.target.closest("#blkSet")&&window.Android)Android.openBlockerSettings()});
+document.addEventListener("click",e=>{if(e.target.closest("#updBtn")&&window.Android)Android.openUpdates()});
+try{if(window.Android){$("updCard").hidden=false;$("verTxt").textContent="You have version "+Android.version()+". Updates install over this one and keep your progress."}}catch(e){}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)render()});
 $("tabs").onclick=e=>{const b=e.target.closest("[data-go]");if(!b)return;
   document.querySelectorAll("[data-go]").forEach(x=>x.setAttribute("aria-current",String(x===b)));
@@ -456,5 +489,6 @@ setInterval(()=>{const e=$("eyes");e.style.transformOrigin="100px 104px";e.style
 setInterval(()=>{if(rollover()){save();render()}},60000);
 say(LINES[Math.floor(Math.random()*LINES.length)]);
 render();
+setTimeout(()=>{const sp=$("splash");if(sp){sp.classList.add("done");setTimeout(()=>sp.remove(),600)}},1500);
 </script>
 </body></html>

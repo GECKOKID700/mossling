@@ -80,5 +80,17 @@ class MainActivity : Activity() {
 
         @JavascriptInterface
         fun openBlockerSettings() = MainActivity.openBlockerSettings(context)
+
+        @JavascriptInterface
+        fun openUpdates() {
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/GECKOKID700/mossling/releases/latest"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }
+
+        @JavascriptInterface
+        fun version(): String =
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?"
     }
 }
