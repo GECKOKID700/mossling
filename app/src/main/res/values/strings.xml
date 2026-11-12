@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mossling</string>
+    <string name="blocker_name">Mossling social media lock</string>
+    <string name="blocker_description">Keeps social media apps closed until you finish your Mossling goals for the day. It only checks which app is opening and never reads what is on your screen.</string>
+</resources>

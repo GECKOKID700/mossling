@@ -1,0 +1,460 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Mossling</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one-column phone app, pet stage on top, tabbed panels below, fixed bottom tab bar */
+:root{
+  --bg:#e8f1ec; --surface:#ffffff; --ink:#23302b; --muted:#5f7068;
+  --moss:#5fa36f; --moss-deep:#3e7a4f; --plum:#7a4b8c; --sun:#e0a12e; --red:#c2493d; --line:#d3e2da;
+  --display:"Fredoka",ui-rounded,system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141c19; --surface:#1e2925; --ink:#e4efe9; --muted:#9db1a7;
+  --moss:#73bb84; --moss-deep:#4f9361; --plum:#c39bd3; --sun:#f2c46b; --red:#e77b70; --line:#2d3b36; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141c19; --surface:#1e2925; --ink:#e4efe9; --muted:#9db1a7;
+  --moss:#73bb84; --moss-deep:#4f9361; --plum:#c39bd3; --sun:#f2c46b; --red:#e77b70; --line:#2d3b36; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.app{max-width:460px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px calc(96px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h1{font-size:22px}
+.hello{color:var(--muted);font-weight:700;font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+.stage{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:16px;text-align:center}
+.stage svg{width:170px;height:160px;display:block;margin:0 auto}
+.bob{animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.speech{font-weight:700;color:var(--muted);min-height:24px;margin-top:4px}
+.energy{margin-top:10px;text-align:left}
+.row-between{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);font-weight:800}
+.bar{height:12px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:4px}
+.bar>i{display:block;height:100%;background:var(--moss);border-radius:999px;transition:width .5s}
+.btn{font:inherit;font-weight:800;border:0;border-radius:14px;padding:10px 16px;background:var(--moss-deep);color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.big{width:100%;padding:14px;font-size:17px}
+.btn:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+.adv{margin-top:12px}
+section.panel{margin-top:16px;display:grid;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.card h3{font-size:17px;margin-bottom:8px}
+.sub{color:var(--muted);font-size:13px;margin:-4px 0 10px}
+.lock{display:flex;gap:12px;align-items:center;border-radius:18px;padding:14px;border:2px solid var(--red);background:color-mix(in srgb,var(--red) 10%,var(--surface))}
+.lock.open{border-color:var(--moss);background:color-mix(in srgb,var(--moss) 12%,var(--surface))}
+.lock .ico{font-size:30px}
+.lock strong{font-family:var(--display);font-size:17px;display:block}
+.lock span{font-size:13px;color:var(--muted)}
+.goal{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.goal:first-child{border-top:0}
+.tick{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid var(--moss);background:transparent;cursor:pointer;color:#fff;font-weight:800}
+.goal.done .tick{background:var(--moss)}
+.goal.done .gt{color:var(--muted);text-decoration:line-through}
+.gt{flex:1;min-width:0}
+.tag{font-size:11px;font-weight:800;color:var(--plum);border:1px solid currentColor;border-radius:999px;padding:0 6px;margin-left:4px;text-transform:uppercase;letter-spacing:.04em}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px}
+.add{display:flex;gap:8px;margin-top:10px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;width:100%;min-width:0}
+textarea{min-height:90px;resize:vertical}
+.cups{display:flex;gap:6px;flex-wrap:wrap}
+.cup{width:34px;height:40px;border-radius:6px 6px 10px 10px;border:2px solid var(--moss);background:transparent;cursor:pointer;font-size:16px;padding:0}
+.cup.full{background:color-mix(in srgb,var(--moss) 45%,var(--surface))}
+.moods{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mood{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:8px 2px;cursor:pointer;font:inherit;font-size:12px;font-weight:800;color:var(--ink);display:grid;justify-items:center;gap:2px}
+.mood b{font-size:24px;font-weight:400}
+.mood[aria-pressed="true"]{border-color:var(--plum);background:color-mix(in srgb,var(--plum) 14%,var(--surface))}
+.prompt{color:var(--muted);font-style:italic;margin:0 0 8px}
+.log{display:grid;gap:8px}
+.entry{border-left:3px solid var(--plum);padding-left:10px;font-size:14px}
+.entry small{color:var(--muted);display:block}
+.ex{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ex:first-child{border-top:0}
+.ex .count{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.ex .count small{font-size:14px;color:var(--muted)}
+.ex .bar{grid-column:1/-1;margin:0}
+.ex-btns{display:flex;gap:6px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.seg button{font:inherit;font-weight:800;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:8px 4px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--moss-deep);background:color-mix(in srgb,var(--moss) 18%,var(--surface))}
+.timer{font-family:var(--display);font-size:64px;text-align:center;font-variant-numeric:tabular-nums;line-height:1.1}
+.timer.warn{color:var(--red)}
+.reps{text-align:center;font-weight:800;color:var(--muted)}
+.tap{width:100%;min-height:120px;border-radius:22px;border:0;background:var(--moss-deep);color:#fff;font-family:var(--display);font-size:28px;cursor:pointer;margin-top:10px;touch-action:manipulation}
+.tap:active{transform:scale(.98)}
+.result{text-align:center;display:grid;gap:8px}
+.result .big{font-family:var(--display);font-size:44px}
+.delta{font-weight:800}
+.delta.up{color:var(--moss-deep)}
+.delta.down{color:var(--red)}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--body);font-size:11px;font-weight:700}
+.breath{display:grid;justify-items:center;gap:14px;padding:10px 0}
+.orb{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--moss) 55%,var(--surface)),var(--moss-deep));transform:scale(.6);transition:transform 4s ease-in-out;display:grid;place-items:center;color:#fff;font-family:var(--display);font-size:18px}
+.shop,.badges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.item,.badge{border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;display:grid;gap:6px;background:var(--bg);align-content:start}
+.item .ico,.badge .ico{font-size:28px}
+.item.on{border-color:var(--moss)}
+.badge.locked{opacity:.45}
+.badge small{color:var(--muted);font-size:12px;line-height:1.3}
+.finds{display:flex;flex-wrap:wrap;gap:6px}
+.find{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.sync{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+ol.steps{margin:0;padding-left:20px;font-size:14px;display:grid;gap:4px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav.tabs button{flex:1;max-width:96px;background:none;border:0;font:inherit;font-size:11px;font-weight:800;color:var(--muted);padding:9px 0 11px;cursor:pointer;display:grid;justify-items:center;gap:1px}
+nav.tabs button b{font-size:20px;font-weight:400}
+nav.tabs button[aria-current="true"]{color:var(--moss-deep)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-weight:800;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center;z-index:6}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.bob{animation:none}.orb{transition:none}}
+</style>
+
+<div class="app">
+  <div class="top">
+    <div><div class="hello" id="hello">Welcome back, Sir</div><h1 id="title">Mossling</h1></div>
+    <div class="chips"><span class="chip" title="Day streak">🔥 <span id="streak">0</span></span><span class="chip" title="Dew drops">💧 <span id="dew">0</span></span></div>
+  </div>
+
+  <div class="stage">
+    <svg viewBox="0 0 200 190" aria-label="Your Mossling pet">
+      <ellipse cx="100" cy="176" rx="58" ry="8" fill="var(--line)"/>
+      <g class="bob">
+        <path d="M100 30c-6-14-22-18-30-10 10 0 20 6 26 14z" fill="var(--moss-deep)"/>
+        <path d="M102 32c4-15 20-22 30-14-10 1-19 7-24 16z" fill="var(--moss)"/>
+        <ellipse cx="100" cy="112" rx="62" ry="60" fill="var(--moss)"/>
+        <ellipse cx="100" cy="128" rx="38" ry="32" fill="color-mix(in srgb,var(--moss) 55%,#ffffff)"/>
+        <circle cx="62" cy="80" r="5" fill="var(--moss-deep)" opacity=".5"/><circle cx="140" cy="92" r="4" fill="var(--moss-deep)" opacity=".5"/><circle cx="74" cy="66" r="3" fill="var(--moss-deep)" opacity=".5"/>
+        <g id="eyes"><ellipse cx="80" cy="104" rx="7" ry="9" fill="#23302b"/><ellipse cx="120" cy="104" rx="7" ry="9" fill="#23302b"/><circle cx="82" cy="100" r="2.5" fill="#fff"/><circle cx="122" cy="100" r="2.5" fill="#fff"/></g>
+        <circle cx="68" cy="120" r="7" fill="#f29aa8" opacity=".55"/><circle cx="132" cy="120" r="7" fill="#f29aa8" opacity=".55"/>
+        <path id="mouth" d="M92 118q8 8 16 0" stroke="#23302b" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <g id="hat"></g>
+      </g>
+    </svg>
+    <div class="speech" id="speech"></div>
+    <div class="energy">
+      <div class="row-between"><span>Energy for adventure</span><span id="energyTxt">0 / 5</span></div>
+      <div class="bar"><i id="energyBar" style="width:0"></i></div>
+    </div>
+    <div class="adv"><button class="btn" id="advBtn" disabled>Send on adventure</button></div>
+  </div>
+
+  <!-- HOME -->
+  <section class="panel" data-tab="home">
+    <div class="lock" id="lock" role="status"></div>
+    <div class="card">
+      <h3>Today's goals</h3>
+      <div id="goals"></div>
+      <form class="add" id="goalForm"><input id="goalInput" placeholder="Add a small goal" maxlength="60"><button class="btn" type="submit">Add</button></form>
+    </div>
+    <div class="card">
+      <div class="row-between" style="margin-bottom:8px"><h3 style="margin:0;color:var(--ink)">Water</h3><span id="waterTxt">0 / 8 cups</span></div>
+      <div class="cups" id="cups"></div>
+    </div>
+    <div class="card"><h3>Adventure finds</h3><div class="finds" id="finds"></div></div>
+  </section>
+
+  <!-- WORKOUT -->
+  <section class="panel" data-tab="workout" hidden>
+    <div class="card">
+      <h3>Daily workout</h3>
+      <p class="sub">Tap +1 for each rep. Each one checks off its goal when you hit the target.</p>
+      <div id="exList"></div>
+    </div>
+    <div class="card">
+      <h3>Weekly strength test</h3>
+      <p class="sub">Once a week per exercise: as many reps as you can in 1 minute. Beat last week to prove you got stronger.</p>
+      <div class="seg" id="seg"></div>
+      <div id="test"></div>
+    </div>
+    <div class="card">
+      <h3 id="chartTitle">Progress</h3>
+      <div id="chart"></div>
+    </div>
+  </section>
+
+  <!-- CHECK-IN -->
+  <section class="panel" data-tab="checkin" hidden>
+    <div class="card"><h3>How are you feeling?</h3><div class="moods" id="moods"></div></div>
+    <div class="card">
+      <h3>Reflect</h3>
+      <p class="prompt" id="prompt"></p>
+      <textarea id="journal" placeholder="Write a few lines…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="saveJ">Save reflection</button>
+        <button class="btn ghost" id="newPrompt">New prompt</button>
+      </div>
+    </div>
+    <div class="card"><h3>Recent check-ins</h3><div class="log" id="log"></div></div>
+    <div class="card">
+      <h3>Breathe</h3>
+      <div class="breath">
+        <div class="orb" id="orb">Ready</div>
+        <button class="btn" id="breathBtn">Start 1 minute</button>
+        <p class="empty" style="text-align:center">Inhale 4s · hold 2s · exhale 4s. Finishing earns energy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ME -->
+  <section class="panel" data-tab="me" hidden>
+    <div class="card"><h3>Achievements</h3><div class="badges" id="badges"></div></div>
+    <div class="card">
+      <h3>Closet</h3>
+      <p class="sub">Spend dew drops on outfits. Tap an owned item to wear it.</p>
+      <div class="shop" id="shop"></div>
+    </div>
+    <div class="card">
+      <h3>Rename your pet</h3>
+      <form class="add" id="nameForm"><input id="nameInput" maxlength="16" placeholder="Pet name"><button class="btn" type="submit">Save</button></form>
+    </div>
+    <div class="card" id="lockHelp">
+      <h3>Lock your social apps for real</h3>
+      <p class="sub">Mossling shows your lock status, but your phone does the blocking. Set it up once:</p>
+      <ol class="steps">
+        <li><b>iPhone:</b> Settings → Screen Time → App Limits → add Social Networking with a 1-minute limit.</li>
+        <li><b>Android:</b> Settings → Digital Wellbeing → Dashboard → set a 1-minute timer on each social app.</li>
+        <li>When Mossling says <b>Unlocked</b>, lift the limit for the day.</li>
+      </ol>
+    </div>
+  </section>
+  <p class="sync" id="sync">Loading your Mossling…</p>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button data-go="home" aria-current="true"><b>🏡</b>Home</button>
+  <button data-go="workout" aria-current="false"><b>💪</b>Workout</button>
+  <button data-go="checkin" aria-current="false"><b>📓</b>Check-in</button>
+  <button data-go="me" aria-current="false"><b>🎩</b>Me</button>
+</nav>
+<div class="toast" id="toast" aria-live="polite"></div>
+
+<script>
+const KEY="mossling-v2";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ymd=d=>{const z=new Date(d);return z.getFullYear()+"-"+String(z.getMonth()+1).padStart(2,"0")+"-"+String(z.getDate()).padStart(2,"0")};
+const today=()=>ymd(Date.now());
+function weekKey(d=new Date()){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()+"-W"+String(Math.ceil(((t-y)/864e5+1)/7)).padStart(2,"0")}
+function daysToNextWeek(){const n=new Date().getDay();return n===0?1:8-n}
+
+const EX={jj:{name:"Jumping jacks",target:20},pu:{name:"Push-ups",target:10},su:{name:"Sit-ups",target:20}};
+const ITEMS=[
+ {id:"acorn",name:"Acorn cap",cost:10,ico:"🌰",svg:'<path d="M70 58q30-30 60 0z" fill="#9a6a3a"/><rect x="96" y="30" width="8" height="10" rx="3" fill="#6b4626"/>'},
+ {id:"flower",name:"Daisy",cost:15,ico:"🌼",svg:'<g transform="translate(138 66)"><circle r="7" cx="0" cy="-10" fill="#fff"/><circle r="7" cx="10" cy="0" fill="#fff"/><circle r="7" cx="0" cy="10" fill="#fff"/><circle r="7" cx="-10" cy="0" fill="#fff"/><circle r="6" fill="#f2b84b"/></g>'},
+ {id:"band",name:"Sweatband",cost:20,ico:"🎽",svg:'<rect x="44" y="76" width="112" height="14" rx="7" fill="#c2493d"/><rect x="44" y="81" width="112" height="4" fill="#fff" opacity=".8"/>'},
+ {id:"beanie",name:"Cozy beanie",cost:25,ico:"🧶",svg:'<path d="M58 72q42-46 84 0z" fill="#7a4b8c"/><rect x="56" y="66" width="88" height="12" rx="6" fill="#5a3468"/><circle cx="100" cy="34" r="8" fill="#c39bd3"/>'},
+ {id:"crown",name:"Leaf crown",cost:40,ico:"🍃",svg:'<g fill="#3e7a4f"><ellipse cx="66" cy="62" rx="12" ry="6" transform="rotate(-40 66 62)"/><ellipse cx="86" cy="52" rx="12" ry="6" transform="rotate(-70 86 52)"/><ellipse cx="114" cy="52" rx="12" ry="6" transform="rotate(70 114 52)"/><ellipse cx="134" cy="62" rx="12" ry="6" transform="rotate(40 134 62)"/></g><circle cx="100" cy="50" r="6" fill="#f2b84b"/>'},
+ {id:"medal",name:"Gold medal",cost:60,ico:"🥇",svg:'<path d="M88 128l12 14 12-14" stroke="#c2493d" stroke-width="5" fill="none"/><circle cx="100" cy="150" r="10" fill="#f2b84b" stroke="#c48a1c" stroke-width="2"/>'}
+];
+const MOODS=[["😞","Rough"],["😕","Meh"],["😐","Okay"],["🙂","Good"],["😄","Great"]];
+const PROMPTS=["What's one small thing that went right today?","Who made you smile recently?","What do you need more of this week?","What's something you're proud of, even a little?","What would you tell a friend who had your day?","What's one thing you can let go of tonight?","What are you building right now that excites you?"];
+const FINDS=["a shiny river pebble","a four-leaf clover","a snail who said hi","a tiny blue feather","a warm sunbeam","a mushroom umbrella","a lost button","a firefly's map","a smooth acorn","a dewdrop rainbow","a pocket-sized gear","a sleepy ladybug"];
+const LINES=["Ready when you are, Sir.","One small step counts.","Workout first, scrolling later!","You're doing better than you think.","Want to drink some water with me?"];
+
+function fresh(){return{name:"Mossling",energy:0,dew:5,streak:0,lastDay:today(),owned:[],wearing:null,
+ goals:[{t:"20 jumping jacks",d:false,ex:"jj",c:0},{t:"10 push-ups",d:false,ex:"pu",c:0},{t:"20 sit-ups",d:false,ex:"su",c:0},{t:"Drink 8 cups of water",d:false,water:true},{t:"Step outside for 5 minutes",d:false}],
+ water:0,log:[],finds:[],mood:null,promptI:0,ch:{jj:[],pu:[],su:[]},
+ stats:{goals:0,workoutDays:0,beat:0,hydrated:0,adventures:0,breaths:0,lastWorkoutDay:""},updatedAt:0}}
+function normalize(s){const f=fresh();s=Object.assign(f,s||{});s.stats=Object.assign(fresh().stats,s.stats||{});s.ch=Object.assign({jj:[],pu:[],su:[]},s.ch||{});return s}
+
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=normalize(S);
+
+function rollover(){
+  if(S.lastDay===today())return false;
+  const y=ymd(Date.now()-864e5);
+  const allDone=S.goals.length>0&&S.goals.every(g=>g.d);
+  const did=S.goals.some(g=>g.d)||S.mood!==null;
+  S.streak=(S.lastDay===y&&did)?S.streak+1:0;
+  if(allDone&&S.lastDay===y)S.streak=Math.max(S.streak,1);
+  S.goals.forEach(g=>{g.d=false;if(g.ex)g.c=0});S.mood=null;S.water=0;S.lastDay=today();return true;
+}
+rollover();
+
+// ---- saving: this device + your private cloud copy ----
+let ref=null,pushT=null;
+function save(){
+  S.updatedAt=Date.now();
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(ref){clearTimeout(pushT);pushT=setTimeout(()=>ref.set({json:JSON.stringify(S),updatedAt:S.updatedAt}).then(()=>setSync("Saved to your account · syncs across your devices")).catch(()=>setSync("Saved on this device · cloud sync paused")),700)}
+}
+const setSync=t=>$("sync").textContent=t;
+(async()=>{
+  const timer=setTimeout(()=>setSync("Saved on this phone"),10000);
+  try{
+    if(!window.claude?.use){clearTimeout(timer);setSync("Saved on this phone");return}
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db||!user){clearTimeout(timer);setSync("Saved on this phone");return}
+    const uid=await user.id();
+    if(!uid){clearTimeout(timer);setSync("Saved on this phone");return}
+    ref=db.doc("data/users/"+uid+"/mossling");
+    const snap=await ref.get();clearTimeout(timer);
+    const remote=snap.exists?snap.data():null;
+    if(remote&&remote.json&&(remote.updatedAt||0)>(S.updatedAt||0)){
+      try{S=normalize(JSON.parse(remote.json))}catch(e){}
+      rollover();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      render();toast("Welcome back, Sir. Progress restored.");
+    }else save();
+    setSync("Saved to your account · syncs across your devices");
+  }catch(e){clearTimeout(timer);setSync("Saved on this phone")}
+})();
+
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400)}
+function say(m){$("speech").textContent=m}
+function gain(e,d,msg){S.energy=Math.min(5,S.energy+e);S.dew+=d;save();render();if(msg)toast(msg)}
+function completeGoal(g,on){
+  if(g.d===on)return;g.d=on;
+  if(on){S.stats.goals++;gain(1,3,"+1 energy · +3 💧");checkWorkoutDay();if(S.goals.every(x=>x.d)){say("All done! Social media unlocked. Proud of you, Sir.");toast("🔓 All goals done. Unlocked for today!")}}
+  else{S.energy=Math.max(0,S.energy-1);S.dew=Math.max(0,S.dew-3);save();render()}
+}
+function checkWorkoutDay(){const w=S.goals.filter(g=>g.ex);if(w.length&&w.every(g=>g.d)&&S.stats.lastWorkoutDay!==today()){S.stats.workoutDays++;S.stats.lastWorkoutDay=today();S.dew+=5;toast("💪 Workout complete · +5 bonus 💧")}}
+
+// ---- render ----
+let sel="pu";
+function render(){
+  const h=new Date().getHours();
+  $("hello").textContent=(h<12?"Good morning":h<18?"Good afternoon":"Good evening")+", Sir";
+  $("title").textContent=S.name;$("streak").textContent=S.streak;$("dew").textContent=S.dew;
+  $("energyTxt").textContent=S.energy+" / 5";$("energyBar").style.width=(S.energy*20)+"%";
+  $("advBtn").disabled=S.energy<5;
+  const it=ITEMS.find(i=>i.id===S.wearing);$("hat").innerHTML=it?it.svg:"";
+  $("mouth").setAttribute("d",S.energy>=3?"M90 116q10 12 20 0":"M92 118q8 6 16 0");
+
+  const left=S.goals.filter(g=>!g.d).length,open=S.goals.length>0&&left===0;
+  const L=$("lock");L.className="lock"+(open?" open":"");
+  L.innerHTML=open?'<div class="ico">🔓</div><div><strong>Social media unlocked</strong><span>Every goal is done. Enjoy it, Sir.</span></div>'
+    :`<div class="ico">🔒</div><div><strong>Social media locked</strong><span>${left} of ${S.goals.length} goal${S.goals.length===1?"":"s"} left before you scroll.</span></div>`;
+
+  try{if(window.Android){Android.setGoalsDone(open,left);const lh=$("lockHelp");if(lh)lh.innerHTML=Android.isBlockerOn()?'<h3>Social media lock is on</h3><p class="sub">Locked apps send you back here until every goal is done. It locks again each new day.</p><button class="btn ghost" id="blkSet">Blocker settings</button>':'<h3>Turn on the social media lock</h3><p class="sub">The blocker is off right now, so social apps can still open.</p><button class="btn" id="blkSet">Turn it on</button>'}}catch(e){}
+  $("goals").innerHTML=S.goals.length?S.goals.map((g,i)=>`<div class="goal${g.d?" done":""}"><button class="tick" data-i="${i}" aria-label="${g.d?"Undo":"Complete"} ${esc(g.t)}">${g.d?"✓":""}</button><span class="gt">${esc(g.t)}${g.ex?'<span class="tag">workout</span>':""}</span><button class="del" data-del="${i}" aria-label="Remove ${esc(g.t)}">×</button></div>`).join(""):'<p class="empty">Add a tiny goal to give your pet energy.</p>';
+  $("waterTxt").textContent=S.water+" / 8 cups";
+  $("cups").innerHTML=Array.from({length:8},(_,i)=>`<button class="cup${i<S.water?" full":""}" data-cup="${i}" aria-label="Cup ${i+1}">${i<S.water?"💧":""}</button>`).join("");
+  $("finds").innerHTML=S.finds.length?S.finds.map(f=>`<span class="find">✨ ${esc(f)}</span>`).join(""):'<p class="empty">Fill the energy bar to send your pet exploring.</p>';
+
+  const exGoals=S.goals.map((g,i)=>[g,i]).filter(([g])=>g.ex);
+  $("exList").innerHTML=exGoals.length?exGoals.map(([g,i])=>{const tg=EX[g.ex].target,c=Math.min(g.c||0,tg);
+    return `<div class="ex"><div><strong>${EX[g.ex].name}</strong><div class="count">${c}<small> / ${tg}</small>${g.d?" ✅":""}</div></div><div class="ex-btns"><button class="btn ghost" data-minus="${i}" aria-label="Remove one rep">−</button><button class="btn" data-plus="${i}" ${g.d?"disabled":""}>+1</button></div><div class="bar"><i style="width:${c/tg*100}%"></i></div></div>`}).join(""):'<p class="empty">Workout goals were removed. They come back tomorrow if you add them on Home.</p>';
+
+  $("seg").innerHTML=Object.entries(EX).map(([k,v])=>`<button data-sel="${k}" aria-pressed="${k===sel}">${v.name}</button>`).join("");
+  if(testState.phase==="idle")renderTestIdle();
+  renderChart();
+
+  $("moods").innerHTML=MOODS.map((m,i)=>`<button class="mood" data-m="${i}" aria-pressed="${S.mood===i}"><b>${m[0]}</b>${m[1]}</button>`).join("");
+  $("prompt").textContent=PROMPTS[S.promptI%PROMPTS.length];
+  $("log").innerHTML=S.log.length?S.log.slice(0,6).map(l=>`<div class="entry"><small>${esc(l.day)} · ${l.mood!=null&&MOODS[l.mood]?MOODS[l.mood][0]+" "+MOODS[l.mood][1]:"No mood"}</small>${esc(l.text)}</div>`).join(""):'<p class="empty">Your reflections will show up here.</p>';
+
+  $("shop").innerHTML=ITEMS.map(i=>{const own=S.owned.includes(i.id),on=S.wearing===i.id;
+    return `<div class="item${on?" on":""}"><div class="ico">${i.ico}</div><strong>${i.name}</strong><button class="btn${own?" ghost":""}" data-shop="${i.id}" ${!own&&S.dew<i.cost?"disabled":""}>${on?"Take off":own?"Wear":"💧 "+i.cost}</button></div>`}).join("");
+
+  const B=[["🌱","First steps","Complete a goal",S.stats.goals>=1],["🔥","Week warrior","7-day streak",S.streak>=7],["💪","Iron core","Finish 5 daily workouts",S.stats.workoutDays>=5],
+    ["📈","Getting stronger","Beat a weekly test",S.stats.beat>=1],["💧","Hydrated","Drink 8 cups in a day",S.stats.hydrated>=1],["🧭","Explorer","Go on 5 adventures",S.stats.adventures>=5],
+    ["🌬️","Calm mind","Finish 3 breathing minutes",S.stats.breaths>=3],["🏆","Unstoppable","Finish 20 daily workouts",S.stats.workoutDays>=20]];
+  $("badges").innerHTML=B.map(b=>`<div class="badge${b[3]?"":" locked"}"><div class="ico">${b[3]?b[0]:"🔒"}</div><strong>${b[1]}</strong><small>${b[2]}</small></div>`).join("");
+}
+
+// ---- weekly test ----
+let testState={phase:"idle"},tick=null;
+function lastOf(k){const a=S.ch[k];return a.length?a[a.length-1]:null}
+function renderTestIdle(){
+  const last=lastOf(sel),done=last&&last.wk===weekKey(),n=daysToNextWeek();
+  $("test").innerHTML=done
+    ?`<div class="result"><div>This week's ${EX[sel].name.toLowerCase()}</div><div class="big">${last.reps}</div><p class="empty">Next test opens in ${n} day${n===1?"":"s"}.</p></div>`
+    :`<p class="empty" style="margin-bottom:10px">${last?`Score to beat: <b>${last.reps}</b> reps.`:"No score yet. This first test sets your baseline."}</p><button class="btn big" id="startTest">Start 1-minute test</button>`;
+}
+function startTest(){
+  testState={phase:"ready",n:3,reps:0};
+  const step=()=>{$("test").innerHTML=`<div class="timer">${testState.n}</div><p class="reps">Get ready for ${EX[sel].name.toLowerCase()}…</p>`;
+    if(testState.n===0){run();return}testState.n--;tick=setTimeout(step,1000)};step();
+}
+function run(){
+  testState.phase="run";testState.end=Date.now()+60000;
+  $("test").innerHTML=`<div class="timer" id="tLeft">1:00</div><p class="reps"><span id="tReps">0</span> reps</p><button class="tap" id="tap">Tap each rep</button><button class="btn ghost" id="stopTest" style="width:100%;margin-top:8px">Stop early</button>`;
+  const upd=()=>{const s=Math.max(0,Math.ceil((testState.end-Date.now())/1000));const el=$("tLeft");if(!el)return;
+    el.textContent="0:"+String(s).padStart(2,"0");el.classList.toggle("warn",s<=10);if(s<=0){finish();return}tick=setTimeout(upd,200)};upd();
+}
+function finish(){
+  clearTimeout(tick);testState.phase="result";
+  $("test").innerHTML=`<div class="result"><div>Time! How many did you do?</div><input id="finalReps" type="number" inputmode="numeric" min="0" max="500" value="${testState.reps}" style="text-align:center;font-size:24px;font-weight:800"><button class="btn big" id="saveTest">Save result</button><button class="btn ghost" id="discardTest">Discard</button></div>`;
+}
+function saveTest(){
+  const r=Math.max(0,Math.min(500,parseInt($("finalReps").value,10)||0));
+  const last=lastOf(sel);S.ch[sel].push({wk:weekKey(),reps:r,date:today()});
+  let msg="Baseline set. Beat it next week!";
+  if(last){const d=r-last.reps;if(d>0){S.stats.beat++;msg=`+${d} reps vs last time. You got stronger, Sir! 💪`;S.dew+=10}else if(d===0)msg="Matched last time. Hold the line!";else msg="A bit lower this week. Rest up and come back strong."}
+  S.dew+=10;testState={phase:"idle"};save();render();say(msg);toast("Test saved · +10 💧")
+}
+function renderChart(){
+  const a=S.ch[sel].slice(-8);$("chartTitle").textContent=EX[sel].name+" · 1-minute test";
+  if(!a.length){$("chart").innerHTML='<p class="empty">Your weekly scores will chart here after your first test.</p>';return}
+  const W=320,H=170,pl=28,pb=26,pt=18,max=Math.max(10,...a.map(x=>x.reps)),top=Math.ceil(max/10)*10;
+  const bw=(W-pl-8)/8,y=v=>pt+(H-pt-pb)*(1-v/top);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly ${EX[sel].name} scores">`;
+  [0,top/2,top].forEach(v=>{s+=`<line x1="${pl}" x2="${W-4}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`});
+  a.forEach((p,i)=>{const x=pl+4+i*bw,last=i===a.length-1;
+    s+=`<rect x="${x}" y="${y(p.reps)}" width="${bw-8}" height="${y(0)-y(p.reps)}" rx="4" fill="${last?"var(--moss-deep)":"var(--moss)"}" opacity="${last?1:.6}"/><text x="${x+(bw-8)/2}" y="${y(p.reps)-5}" text-anchor="middle">${p.reps}</text><text x="${x+(bw-8)/2}" y="${H-8}" text-anchor="middle">${p.wk.slice(-3)}</text>`});
+  s+="</svg>";
+  if(a.length>1){const d=a[a.length-1].reps-a[0].reps;s+=`<p class="delta ${d>=0?"up":"down"}" style="margin:6px 0 0;text-align:center">${d>=0?"▲":"▼"} ${Math.abs(d)} reps since ${a[0].wk.replace("-"," ")}</p>`}
+  $("chart").innerHTML=s;
+}
+
+// ---- events ----
+$("goals").onclick=e=>{
+  const t=e.target.closest("[data-i]"),d=e.target.closest("[data-del]");
+  if(t){const g=S.goals[t.dataset.i];if(g.ex&&!g.d)g.c=EX[g.ex].target;if(g.water&&!g.d)S.water=8;completeGoal(g,!g.d)}
+  if(d){S.goals.splice(d.dataset.del,1);save();render()}
+};
+$("goalForm").onsubmit=e=>{e.preventDefault();const v=$("goalInput").value.trim();if(!v)return;S.goals.push({t:v,d:false});$("goalInput").value="";save();render()};
+$("cups").onclick=e=>{const b=e.target.closest("[data-cup]");if(!b)return;const i=+b.dataset.cup;S.water=S.water===i+1?i:i+1;
+  const wg=S.goals.find(g=>g.water);
+  if(S.water>=8){if(S.stats.lastHydrated!==today()){S.stats.hydrated++;S.stats.lastHydrated=today()}if(wg&&!wg.d){completeGoal(wg,true);return}}
+  else if(wg&&wg.d){completeGoal(wg,false);return}
+  save();render()};
+$("exList").onclick=e=>{const p=e.target.closest("[data-plus]"),m=e.target.closest("[data-minus]");
+  if(p){const g=S.goals[p.dataset.plus];g.c=(g.c||0)+1;if(g.c>=EX[g.ex].target){completeGoal(g,true);return}save();render()}
+  if(m){const g=S.goals[m.dataset.minus];g.c=Math.max(0,(g.c||0)-1);if(g.d&&g.c<EX[g.ex].target){completeGoal(g,false);return}save();render()}};
+$("seg").onclick=e=>{const b=e.target.closest("[data-sel]");if(!b||testState.phase!=="idle")return;sel=b.dataset.sel;render()};
+$("test").onclick=e=>{
+  if(e.target.closest("#startTest"))startTest();
+  else if(e.target.closest("#tap")){testState.reps++;$("tReps").textContent=testState.reps}
+  else if(e.target.closest("#stopTest"))finish();
+  else if(e.target.closest("#saveTest"))saveTest();
+  else if(e.target.closest("#discardTest")){testState={phase:"idle"};render()}
+};
+$("moods").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const first=S.mood===null;S.mood=+b.dataset.m;
+  if(first)gain(1,2,"Thanks for checking in · +1 energy");else{save();render()}
+  say(S.mood<=1?"That sounds hard. I'm right here with you.":S.mood===2?"Okay is okay. Let's be gentle today.":"Yes! I love that for you.")};
+$("newPrompt").onclick=()=>{S.promptI++;save();render()};
+$("saveJ").onclick=()=>{const v=$("journal").value.trim();if(!v){toast("Write something first");return}
+  S.log.unshift({day:new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"}),mood:S.mood,text:v});S.log=S.log.slice(0,60);$("journal").value="";gain(1,4,"Reflection saved · +1 energy")};
+$("advBtn").onclick=()=>{const f=FINDS[Math.floor(Math.random()*FINDS.length)];S.energy=0;S.finds.unshift(f);S.finds=S.finds.slice(0,12);S.dew+=10;S.stats.adventures++;save();render();
+  say(`I'm back! I found ${f}!`);toast("Adventure complete · +10 💧")};
+$("shop").onclick=e=>{const b=e.target.closest("[data-shop]");if(!b)return;const i=ITEMS.find(x=>x.id===b.dataset.shop);
+  if(S.owned.includes(i.id))S.wearing=S.wearing===i.id?null:i.id;
+  else if(S.dew>=i.cost){S.dew-=i.cost;S.owned.push(i.id);S.wearing=i.id;toast(`Bought ${i.name}`)}
+  save();render()};
+$("nameForm").onsubmit=e=>{e.preventDefault();const v=$("nameInput").value.trim();if(!v)return;S.name=v;$("nameInput").value="";save();render();toast(`Hi Sir, I'm ${v}!`)};
+document.addEventListener("click",e=>{if(e.target.closest("#blkSet")&&window.Android)Android.openBlockerSettings()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)render()});
+$("tabs").onclick=e=>{const b=e.target.closest("[data-go]");if(!b)return;
+  document.querySelectorAll("[data-go]").forEach(x=>x.setAttribute("aria-current",String(x===b)));
+  document.querySelectorAll("section.panel").forEach(p=>p.hidden=p.dataset.tab!==b.dataset.go);window.scrollTo(0,0)};
+
+let breathing=false;
+$("breathBtn").onclick=async()=>{
+  if(breathing)return;breathing=true;$("breathBtn").disabled=true;const o=$("orb");
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  for(let c=0;c<6;c++){o.textContent="Breathe in";o.style.transform="scale(1)";await wait(4000);
+    o.textContent="Hold";await wait(2000);o.textContent="Breathe out";o.style.transform="scale(.6)";await wait(4000)}
+  o.textContent="Nice work";breathing=false;$("breathBtn").disabled=false;S.stats.breaths++;gain(1,3,"Calm minute done · +1 energy")};
+
+setInterval(()=>{const e=$("eyes");e.style.transformOrigin="100px 104px";e.style.transform="scaleY(.1)";setTimeout(()=>e.style.transform="",150)},4200);
+setInterval(()=>{if(rollover()){save();render()}},60000);
+say(LINES[Math.floor(Math.random()*LINES.length)]);
+render();
+</script>
+</body></html>

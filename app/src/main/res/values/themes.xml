@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="moss">#5FA36F</color>
+    <color name="moss_deep">#3E7A4F</color>
+    <color name="bg">#E8F1EC</color>
+
+    <style name="Theme.Mossling" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">@color/moss_deep</item>
+    </style>
+</resources>
